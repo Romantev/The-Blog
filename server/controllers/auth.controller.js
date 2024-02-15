@@ -1,9 +1,11 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
+import { errorHandler } from "../utils/error.js";
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   const { username, email, password } = req.body;
 
+  // if input is invalid
   if (
     !username ||
     !email ||
@@ -12,7 +14,7 @@ export const register = async (req, res) => {
     email === "" ||
     password === ""
   ) {
-    return res.status(400).json({ message: "All fields are required!" });
+    next(errorHandler(400, "All fields are required!"));
   }
 
   // hash password
@@ -27,9 +29,8 @@ export const register = async (req, res) => {
 
   try {
     await newUser.save();
+    res.json("Register successful!");
   } catch (error) {
-    res.status(500).json("failed to register!");
+    next(error);
   }
-
-  res.json("Register successful!");
 };
