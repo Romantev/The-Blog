@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import bcryptjs from "bcryptjs";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -13,10 +14,15 @@ export const register = async (req, res) => {
   ) {
     return res.status(400).json({ message: "All fields are required!" });
   }
+
+  // hash password
+  const hashedPassword = bcryptjs.hashSync(password, 10);
+
+  // create new user to MongoDB
   const newUser = new User({
     username,
     email,
-    password,
+    password: hashedPassword,
   });
 
   try {
